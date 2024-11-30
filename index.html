@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do App</title>
+</head>
+<body>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f4f8;
+    }
+  
+    .container {
+      width: 300px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  
+    h1 {
+      text-align: center;
+    }
+  
+    form {
+      margin-bottom: 20px;
+    }
+  
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+  
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  
+    button:hover {
+      background-color: #45a049;
+    }
+  
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  
+    li {
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    button.delete {
+      background-color: #f44336;
+      max-width: 50px;
+    }
+  
+    button.delete:hover {
+      background-color: #e53935;
+    }
+  </style>
+
+  <div class="container">
+    <h1>To-Do App</h1>
+    
+    <form id="taskForm">
+      <label for="taskText">Name</label>
+      <input type="text" id="taskText" required>
+      
+      <label for="taskNumber">Qarz (dollar)</label>
+      <input type="number" id="taskNumber" required>
+      <button type="submit">Add Task</button>
+    </form>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    window.onload = function() {
+      const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      savedTasks.forEach(task => {
+        addTaskToList(task.number, task.text);
+      });
+    };
+
+
+    document.getElementById('taskForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+    
+      const taskNumber = document.getElementById('taskNumber').value;
+      const taskText = document.getElementById('taskText').value;
+    
+      if (taskNumber && taskText) {
+        addTaskToList(taskNumber, taskText);
+        saveTasksToLocalStorage();
+
+        document.getElementById('taskNumber').value = '';
+        document.getElementById('taskText').value = '';
+      }
+    });
+
+    function addTaskToList(taskNumber, taskText) {
+      const taskList = document.getElementById('taskList');
+      const taskItem = document.createElement('li');
+      taskItem.innerHTML = `
+        <span>${taskText}: ${taskNumber}$ </span>
+        <button class="delete">Delete</button>
+      `;
+    
+      taskItem.querySelector('.delete').addEventListener('click', function() {
+        taskList.removeChild(taskItem);
+        saveTasksToLocalStorage();
+      });
+    
+      taskList.appendChild(taskItem);
+    }
+
+ 
+    function getTasksFromList() {
+      const tasks = [];
+      document.querySelectorAll('#taskList li').forEach((item) => {
+        const taskText = item.querySelector('span').textContent;
+        const taskNumber = taskText.split(":")[0].split(" ")[1];
+        tasks.push({ number: taskNumber, text: taskText.split(": ")[1] });
+      });
+      return tasks;
+    }
+
+    function saveTasksToLocalStorage() {
+      const tasks = getTasksFromList();
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+  </script>
+</body>
+</html>
